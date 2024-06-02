@@ -1,0 +1,11 @@
+{
+    "senderEmail": "your-email@yourdomain.com",
+    "senderName": "Your Name",
+    "smtpServer": "smtp.gmail.com",
+    "smtpPort": 587,
+    "smtpUsername": "your-email@yourdomain.com",
+    "smtpPassword": "your-app-password",
+    "emailSubject": "Rail Quote Request",
+    "emailTemplate": "Hello, \\n\\nWe are looking for a quote on the following lane. Please send over your best all-in rate!\\n\\nBCO: [BCO]\\nPickup Location: [Pickup Location]\\nDelivery Location: [Delivery Location]\\nVolumes: [Volumes]\\nContainer Size: [40 or 53 container]\\nLive / Drop: [Live / Drop]\\nCommodity: [Commodity]\\nSpecial requirements: [Special requirements]\\n\\n-------------------------------------------‐--------\\nPinnacle Logistics (Agency of Priority 1)\\nOperations Team\\nOps Team Phone (call or text): 602-603-4133\\n-----------------------------------------------------",
+    "replyToEmail": "reply-to-email@yourdomain.com"
+}
