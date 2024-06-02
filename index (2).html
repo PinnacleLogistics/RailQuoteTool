@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Rail Quote Request</title>
+    <style>
+        body { font-family: Arial, sans-serif; }
+        form { max-width: 600px; margin: auto; padding: 20px; border: 1px solid #ccc; border-radius: 5px; }
+        label { display: block; margin-top: 10px; }
+        input, select, textarea { width: 100%; padding: 10px; margin-top: 5px; }
+        button { margin-top: 20px; padding: 10px 20px; }
+    </style>
+</head>
+<body>
+    <h1>Rail Quote Request</h1>
+    <form id="quoteForm">
+        <label for="bco">BCO</label>
+        <input type="text" id="bco" name="bco" required>
+
+        <label for="pickupLocation">Pickup Location</label>
+        <input type="text" id="pickupLocation" name="pickupLocation" required>
+
+        <label for="deliveryLocation">Delivery Location</label>
+        <input type="text" id="deliveryLocation" name="deliveryLocation" required>
+
+        <label for="volumes">Volumes</label>
+        <input type="text" id="volumes" name="volumes" required>
+
+        <label for="containerSize">Container Size</label>
+        <select id="containerSize" name="containerSize" required>
+            <option value="40">40</option>
+            <option value="53">53</option>
+        </select>
+
+        <label for="liveDrop">Live / Drop</label>
+        <select id="liveDrop" name="liveDrop" required>
+            <option value="Live">Live</option>
+            <option value="Drop">Drop</option>
+        </select>
+
+        <label for="commodity">Commodity</label>
+        <input type="text" id="commodity" name="commodity" required>
+
+        <label for="specialRequirements">Special Requirements</label>
+        <select id="specialRequirements" name="specialRequirements" multiple>
+            <option value="Straps">Straps</option>
+            <option value="Floor Loaded">Floor Loaded</option>
+            <option value="Other">Other</option>
+        </select>
+        <textarea id="otherRequirements" name="otherRequirements" placeholder="If other, specify here"></textarea>
+
+        <button type="submit">Submit</button>
+    </form>
+
+    <button id="settingsButton">Settings</button>
+
+    <script>
+        document.getElementById('quoteForm').addEventListener('submit', async (event) => {
+            event.preventDefault();
+            const formData = new FormData(event.target);
+            const data = Object.fromEntries(formData.entries());
+            data.specialRequirements = [...formData.getAll('specialRequirements'), formData.get('otherRequirements')].filter(Boolean).join(', ');
+
+            const response = await fetch('/send-quote', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(data),
+            });
+
+            if (response.ok) {
+                alert('Quote request sent successfully!');
+            } else {
+                alert('Failed to send quote request.');
+            }
+        });
+
+        document.getElementById('settingsButton').addEventListener('click', () => {
+            window.location.href = '/settings';
+        });
+    </script>
+</body>
+</html>

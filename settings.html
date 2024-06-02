@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Email Settings</title>
+    <style>
+        body { font-family: Arial, sans-serif; }
+        form { max-width: 600px; margin: auto; padding: 20px; border: 1px solid #ccc; border-radius: 5px; }
+        label { display: block; margin-top: 10px; }
+        input, select, textarea { width: 100%; padding: 10px; margin-top: 5px; }
+        button { margin-top: 20px; padding: 10px 20px; }
+    </style>
+</head>
+<body>
+    <h1>Email Settings</h1>
+    <form id="settingsForm">
+        <label for="senderEmail">Sender Email Address</label>
+        <input type="email" id="senderEmail" name="senderEmail" required>
+
+        <label for="senderName">Sender Name</label>
+        <input type="text" id="senderName" name="senderName" required>
+
+        <label for="smtpServer">SMTP Server</label>
+        <input type="text" id="smtpServer" name="smtpServer" required>
+
+        <label for="smtpPort">SMTP Port</label>
+        <input type="number" id="smtpPort" name="smtpPort" required>
+
+        <label for="smtpUsername">SMTP Username</label>
+        <input type="text" id="smtpUsername" name="smtpUsername" required>
+
+        <label for="smtpPassword">SMTP Password</label>
+        <input type="password" id="smtpPassword" name="smtpPassword" required>
+
+        <label for="emailSubject">Email Subject</label>
+        <input type="text" id="emailSubject" name="emailSubject" required>
+
+        <label for="emailTemplate">Email Template</label>
+        <textarea id="emailTemplate" name="emailTemplate" rows="10" required></textarea>
+
+        <label for="replyToEmail">Reply-To Email Address</label>
+        <input type="email" id="replyToEmail" name="replyToEmail" required>
+
+        <button type="submit">Save Settings</button>
+    </form>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', async () => {
+            const response = await fetch('/get-settings');
+            const settings = await response.json();
+            document.getElementById('senderEmail').value = settings.senderEmail;
+            document.getElementById('senderName').value = settings.senderName;
+            document.getElementById('smtpServer').value = settings.smtpServer;
+            document.getElementById('smtpPort').value = settings.smtpPort;
+            document.getElementById('smtpUsername').value = settings.smtpUsername;
+            document.getElementById('smtpPassword').value = settings.smtpPassword;
+            document.getElementById('emailSubject').value = settings.emailSubject;
+            document.getElementById('emailTemplate').value = settings.emailTemplate;
+            document.getElementById('replyToEmail').value = settings.replyToEmail;
+        });
+
+        document.getElementById('settingsForm').addEventListener('submit', async (event) => {
+            event.preventDefault();
+            const formData = new FormData(event.target);
+            const data = Object.fromEntries(formData.entries());
+
+            const response = await fetch('/save-settings', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(data),
+            });
+
+            if (response.ok) {
+                alert('Settings saved successfully!');
+            } else {
+                alert('Failed to save settings.');
+            }
+        });
+    </script>
+</body>
+</html>
