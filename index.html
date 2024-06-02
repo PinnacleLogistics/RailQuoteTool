@@ -78,8 +78,9 @@
         });
 
         document.getElementById('settingsButton').addEventListener('click', () => {
-            window.location.href = `${baseURL}settings`;
-    });
-</script>
+            const basePath = window.location.pathname.replace(/\/[^/]*$/, ''); // Remove the current file name from the path
+            window.location.href = `${basePath}/settings`;
+        });
+    </script>
 </body>
 </html>
