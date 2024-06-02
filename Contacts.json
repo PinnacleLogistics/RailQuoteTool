@@ -1,0 +1,14 @@
+[
+    {
+        "name": "Contact 1",
+        "carrierName": "Carrier 1",
+        "quoteEmail": "contact1@example.com",
+        "mcNumber": "MC123456"
+    },
+    {
+        "name": "Contact 2",
+        "carrierName": "Carrier 2",
+        "quoteEmail": "contact2@example.com",
+        "mcNumber": "MC654321"
+    }
+]
