@@ -82,6 +82,11 @@
 
     <script>
         document.addEventListener('DOMContentLoaded', async () => {
+            await loadSettings();
+            await loadContacts();
+        });
+
+        async function loadSettings() {
             const response = await fetch('/get-settings');
             const settings = await response.json();
             document.getElementById('senderEmail').value = settings.senderEmail;
@@ -93,9 +98,28 @@
             document.getElementById('emailSubject').value = settings.emailSubject;
             document.getElementById('emailTemplate').value = settings.emailTemplate;
             document.getElementById('replyToEmail').value = settings.replyToEmail;
+        }
 
-            await loadContacts();
-        });
+        async function loadContacts() {
+            const response = await fetch('/contacts');
+            const contacts = await response.json();
+            const contactsTableBody = document.getElementById('contactsTableBody');
+            contactsTableBody.innerHTML = '';
+            contacts.forEach(contact => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${contact.nameInEmail}</td>
+                    <td>${contact.carrierName}</td>
+                    <td>${contact.quoteEmail}</td>
+                    <td>${contact.mcNumber}</td>
+                    <td>
+                        <button type="button" onclick="editContact(${contact.id})">Edit</button>
+                        <button type="button" onclick="deleteContact(${contact.id})">Delete</button>
+                    </td>
+                `;
+                contactsTableBody.appendChild(row);
+            });
+        }
 
         document.getElementById('settingsForm').addEventListener('submit', async (event) => {
             event.preventDefault();
@@ -138,27 +162,6 @@
                 alert('Failed to save contact.');
             }
         });
-
-        async function loadContacts() {
-            const response = await fetch('/contacts');
-            const contacts = await response.json();
-            const contactsTableBody = document.getElementById('contactsTableBody');
-            contactsTableBody.innerHTML = '';
-            contacts.forEach(contact => {
-                const row = document.createElement('tr');
-                row.innerHTML = `
-                    <td>${contact.nameInEmail}</td>
-                    <td>${contact.carrierName}</td>
-                    <td>${contact.quoteEmail}</td>
-                    <td>${contact.mcNumber}</td>
-                    <td>
-                        <button type="button" onclick="editContact(${contact.id})">Edit</button>
-                        <button type="button" onclick="deleteContact(${contact.id})">Delete</button>
-                    </td>
-                `;
-                contactsTableBody.appendChild(row);
-            });
-        }
 
         window.editContact = async function editContact(id) {
             const response = await fetch(`/contacts/${id}`);
