@@ -105,6 +105,60 @@ app.post('/save-settings', (req, res) => {
     res.status(200).send('Settings saved successfully');
 });
 
+// Contact Management Endpoints
+
+app.get('/contacts', (req, res) => {
+    res.json(contacts);
+});
+
+app.post('/contacts', (req, res) => {
+    const newContact = {
+        id: contacts.length ? contacts[contacts.length - 1].id + 1 : 1,
+        nameInEmail: req.body.nameInEmail,
+        carrierName: req.body.carrierName,
+        quoteEmail: req.body.quoteEmail,
+        mcNumber: req.body.mcNumber
+    };
+    contacts.push(newContact);
+    fs.writeFileSync('contacts.json', JSON.stringify(contacts, null, 2));
+    res.status(201).json(newContact);
+});
+
+app.put('/contacts', (req, res) => {
+    const contactId = parseInt(req.body.contactId, 10);
+    const contactIndex = contacts.findIndex(contact => contact.id === contactId);
+    if (contactIndex !== -1) {
+        contacts[contactIndex] = {
+            id: contactId,
+            nameInEmail: req.body.nameInEmail,
+            carrierName: req.body.carrierName,
+            quoteEmail: req.body.quoteEmail,
+            mcNumber: req.body.mcNumber
+        };
+        fs.writeFileSync('contacts.json', JSON.stringify(contacts, null, 2));
+        res.status(200).json(contacts[contactIndex]);
+    } else {
+        res.status(404).send('Contact not found');
+    }
+});
+
+app.get('/contacts/:id', (req, res) => {
+    const contactId = parseInt(req.params.id, 10);
+    const contact = contacts.find(contact => contact.id === contactId);
+    if (contact) {
+        res.json(contact);
+    } else {
+        res.status(404).send('Contact not found');
+    }
+});
+
+app.delete('/contacts/:id', (req, res) => {
+    const contactId = parseInt(req.params.id, 10);
+    contacts = contacts.filter(contact => contact.id !== contactId);
+    fs.writeFileSync('contacts.json', JSON.stringify(contacts, null, 2));
+    res.status(200).send('Contact deleted');
+});
+
 app.listen(PORT, () => {
     console.log(`Server is running on http://localhost:${PORT}`);
 });
