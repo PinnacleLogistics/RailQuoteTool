@@ -10,6 +10,8 @@
         label { display: block; margin-top: 10px; }
         input, select, textarea { width: 100%; padding: 10px; margin-top: 5px; }
         button { margin-top: 20px; padding: 10px 20px; }
+        table { width: 100%; margin-top: 20px; border-collapse: collapse; }
+        th, td { border: 1px solid #ccc; padding: 10px; text-align: left; }
     </style>
 </head>
 <body>
@@ -45,6 +47,39 @@
         <button type="submit">Save Settings</button>
     </form>
 
+    <h2>Manage Contacts</h2>
+    <table>
+        <thead>
+            <tr>
+                <th>Name in Email</th>
+                <th>Carrier Name</th>
+                <th>Quote Email</th>
+                <th>MC#</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody id="contactsTableBody">
+            <!-- Contacts will be populated here -->
+        </tbody>
+    </table>
+
+    <form id="contactForm">
+        <input type="hidden" id="contactId" name="contactId">
+        <label for="nameInEmail">Name in Email</label>
+        <input type="text" id="nameInEmail" name="nameInEmail" required>
+
+        <label for="carrierName">Carrier Name</label>
+        <input type="text" id="carrierName" name="carrierName" required>
+
+        <label for="quoteEmail">Quote Email</label>
+        <input type="email" id="quoteEmail" name="quoteEmail" required>
+
+        <label for="mcNumber">MC#</label>
+        <input type="text" id="mcNumber" name="mcNumber" required>
+
+        <button type="submit">Add/Update Contact</button>
+    </form>
+
     <script>
         document.addEventListener('DOMContentLoaded', async () => {
             const response = await fetch('/get-settings');
@@ -58,6 +93,8 @@
             document.getElementById('emailSubject').value = settings.emailSubject;
             document.getElementById('emailTemplate').value = settings.emailTemplate;
             document.getElementById('replyToEmail').value = settings.replyToEmail;
+
+            await loadContacts();
         });
 
         document.getElementById('settingsForm').addEventListener('submit', async (event) => {
@@ -79,6 +116,69 @@
                 alert('Failed to save settings.');
             }
         });
+
+        document.getElementById('contactForm').addEventListener('submit', async (event) => {
+            event.preventDefault();
+            const formData = new FormData(event.target);
+            const data = Object.fromEntries(formData.entries());
+
+            const response = await fetch('/contacts', {
+                method: data.contactId ? 'PUT' : 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(data),
+            });
+
+            if (response.ok) {
+                alert('Contact saved successfully!');
+                document.getElementById('contactForm').reset();
+                await loadContacts();
+            } else {
+                alert('Failed to save contact.');
+            }
+        });
+
+        async function loadContacts() {
+            const response = await fetch('/contacts');
+            const contacts = await response.json();
+            const contactsTableBody = document.getElementById('contactsTableBody');
+            contactsTableBody.innerHTML = '';
+            contacts.forEach(contact => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${contact.nameInEmail}</td>
+                    <td>${contact.carrierName}</td>
+                    <td>${contact.quoteEmail}</td>
+                    <td>${contact.mcNumber}</td>
+                    <td>
+                        <button type="button" onclick="editContact(${contact.id})">Edit</button>
+                        <button type="button" onclick="deleteContact(${contact.id})">Delete</button>
+                    </td>
+                `;
+                contactsTableBody.appendChild(row);
+            });
+        }
+
+        window.editContact = async function editContact(id) {
+            const response = await fetch(`/contacts/${id}`);
+            const contact = await response.json();
+            document.getElementById('contactId').value = contact.id;
+            document.getElementById('nameInEmail').value = contact.nameInEmail;
+            document.getElementById('carrierName').value = contact.carrierName;
+            document.getElementById('quoteEmail').value = contact.quoteEmail;
+            document.getElementById('mcNumber').value = contact.mcNumber;
+        }
+
+        window.deleteContact = async function deleteContact(id) {
+            const response = await fetch(`/contacts/${id}`, { method: 'DELETE' });
+            if (response.ok) {
+                alert('Contact deleted successfully!');
+                await loadContacts();
+            } else {
+                alert('Failed to delete contact.');
+            }
+        }
     </script>
 </body>
 </html>
